@@ -5,10 +5,10 @@ FROM python:3.12.3
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-# Copia o arquivo ServidorUDP.py para o diretório de trabalho no contêiner
-COPY ServidorUDP.py .
+# Copia o arquivo Servidor.py para o diretório de trabalho no contêiner
+COPY Servidor.py .
 
 # Executa o script quando o contêiner for iniciado
-CMD ["python", "ServidorUDP.py"]
+CMD ["python", "Servidor.py"]
 
 #docker build -t dispositivo .
