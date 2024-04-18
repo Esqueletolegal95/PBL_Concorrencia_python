@@ -1,7 +1,6 @@
 import socket
 import threading
 import json
-from flask import Flask, request, jsonify
 
 udp_dados = {}
 tcp_dados = {}
@@ -48,23 +47,17 @@ def iniciar_tcp(server_socket):
     except Exception as e:
         print(e)
 
-# Iniciar Flask App
-app = Flask(__name__)
-
-@app.route('/enviar-via-api-tcp', methods=['POST'])
-def enviar_via_api_tcp():
+def enviar_via_tcp(dados_json):
     try:
-        dados_json = request.get_json()
-        
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect(('localhost', 1235))
+            s.connect(('localhost', 5000))
             mensagem_json = json.dumps(dados_json)
             s.sendall(mensagem_json.encode('utf-8'))
+            print("Mensagem enviada via TCP")
         
-        return jsonify({"status": "success", "message": "Mensagem enviada via API TCP"}), 200
-
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print(f"Erro ao enviar mensagem via TCP: {e}")
+
 
 def main():
     try:
@@ -74,19 +67,17 @@ def main():
 
         # Iniciar servidor TCP
         tcp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        tcp_server_socket.bind(('localhost', 1235))
+        tcp_server_socket.bind(('0.0.0.0', 5000))
         tcp_server_socket.listen(5)  # Permitir até 5 conexões pendentes
 
         # Threads para os servidores UDP e TCP
         udp_thread = threading.Thread(target=iniciar_udp, args=(udp_server_socket,))
         tcp_thread = threading.Thread(target=iniciar_tcp, args=(tcp_server_socket,))
         
-        # Thread para o servidor Flask
-        flask_thread = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5000})
 
         udp_thread.start()
         tcp_thread.start()
-        flask_thread.start()
+        enviar_via_tcp({"temperatura": 43})
 
     except Exception as e:
         print(e)
