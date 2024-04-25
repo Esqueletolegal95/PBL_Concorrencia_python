@@ -45,6 +45,19 @@ def mudar_temperatura():
     udp_dados = {"status": "Temperatura alterada com sucesso", "novaTemperatura": novaTemperatura, "porta": porta}
     return jsonify(udp_dados)
 
+@app.route('/ligar_desligar', methods=['POST'])
+def ligar_desligar():
+    # Recebendo dados da requisição POST
+    data = request.json
+    ligar_desligar = data.get('ligar_desligar')
+    porta = data.get('porta')
+    
+    # Aqui você pode adicionar lógica para mudar a temperatura e a porta
+    enviar_via_tcp({"ligar_desligar":ligar_desligar}, porta)
+    # Exemplo de dados para retornar
+    udp_dados = {"status": "Temperatura alterada com sucesso", "ligar_desligar": ligar_desligar, "porta": porta}
+    return jsonify(udp_dados)
+
 
 @app.route('/tcp_dados', methods=['GET'])
 def get_tcp_dados():
@@ -96,4 +109,4 @@ if __name__ == "__main__":
     
     udp_thread.start()
     tcp_thread.start()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5050)

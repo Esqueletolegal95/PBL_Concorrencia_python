@@ -30,12 +30,13 @@ def enviar_mensagem_udp():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             while True:
+
                 mensagem_dict = {
-                    'porta': 1237,
+                    'porta': 1236,
                     'temperatura': temperatura,
                     'ligado':ligado
                 }
-                
+
                 mensagem_json = json.dumps(mensagem_dict)
                 
                 s.sendto(mensagem_json.encode(), ("localhost", 1234))  # Enviar via UDP
@@ -45,6 +46,7 @@ def enviar_mensagem_udp():
                 
                 s.sendto(mensagem_json.encode(), ("localhost", 1234))  # Enviar via UDP
 
+                
                 time.sleep(1)
     except Exception as e:
         print(f"Erro ao enviar mensagem UDP: {e}")
@@ -54,7 +56,7 @@ def receber_mensagem_tcp():
     global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("localhost", 1237))
+            s.bind(("localhost", 1236))
             s.listen(1)  # Aceitar apenas uma conexão por vez
 
             print(f"Aguardando conexão TCP em {host_ip}:5000...")
