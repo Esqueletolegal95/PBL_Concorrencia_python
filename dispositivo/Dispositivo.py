@@ -5,6 +5,7 @@ import time
 import threading
 
 temperatura = random.randint(0, 34)
+ligado = True
 
 def modificarTemperatura(novaTemperatura):
     return novaTemperatura
@@ -17,29 +18,40 @@ def get_host_ip_address():
 
 host_ip = get_host_ip_address()
 
-def enviar_mensagem_udp(temperatura):
+def liga_desliga():
+    global ligado
+    if ligado:
+        ligado = False
+    else:
+        ligado=True
+
+def enviar_mensagem_udp():
+    global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             while True:
-                mensagem_dict = {
-                    'ip': host_ip,
-                    'temperatura': temperatura
-                }
-                
-                mensagem_json = json.dumps(mensagem_dict)
-                
-                s.sendto(mensagem_json.encode(), ("localhost", 1234))  # Enviar via UDP
+                if ligado:
+                    mensagem_dict = {
+                        'ip': host_ip,
+                        'temperatura': temperatura
+                    }
+                    
+                    mensagem_json = json.dumps(mensagem_dict)
+                    
+                    s.sendto(mensagem_json.encode(), ("localhost", 1234))  # Enviar via UDP
                 
 
                 
                 time.sleep(1)
     except Exception as e:
         print(f"Erro ao enviar mensagem UDP: {e}")
+    
 
 def receber_mensagem_tcp():
+    global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("localhost", 5000))
+            s.bind(("localhost", 1235))
             s.listen(1)  # Aceitar apenas uma conexão por vez
 
             print(f"Aguardando conexão TCP em {host_ip}:5000...")
@@ -50,15 +62,17 @@ def receber_mensagem_tcp():
                 data = conn.recv(1024)  # Receber dados do cliente
                 if not data:
                     break
-                
-                mensagem = data.decode()
+                mensagem = json.loads(data.decode())  # Decodificar a mensagem JSON
+                if "Temperatura" in mensagem:
+                    temperatura = mensagem["Temperatura"]
+                    print(temperatura)
                 print(f"Mensagem TCP recebida: {mensagem}")
                 
     except Exception as e:
         print(f"Erro ao receber mensagem TCP: {e}")
 
 def servidor_udp():
-    enviar_mensagem_udp(temperatura)
+    enviar_mensagem_udp()
 
 def main():
     try:
