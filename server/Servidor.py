@@ -8,12 +8,13 @@ app = Flask(__name__)
 udp_dados = {}
 tcp_dados = {}
 
+
+
 def handle_client_udp(client_address, client_port, data):
     try:
         mensagem_cliente = data.decode()
         print(f"Mensagem UDP do cliente {client_address}:{client_port}: {mensagem_cliente}")
         udp_dados[client_port] = mensagem_cliente
-        print(udp_dados)
     except Exception as e:
         print(e)
 
@@ -38,8 +39,7 @@ def mudar_temperatura():
     data = request.json
     novaTemperatura = data.get('novaTemperatura')
     porta = data.get('porta')
-    
-    # Aqui você pode adicionar lógica para mudar a temperatura e a porta
+    print(porta)
     enviar_via_tcp({"Temperatura":novaTemperatura}, porta)
     # Exemplo de dados para retornar
     udp_dados = {"status": "Temperatura alterada com sucesso", "novaTemperatura": novaTemperatura, "porta": porta}
@@ -52,10 +52,9 @@ def ligar_desligar():
     ligar_desligar = data.get('ligar_desligar')
     porta = data.get('porta')
     
-    # Aqui você pode adicionar lógica para mudar a temperatura e a porta
     enviar_via_tcp({"ligar_desligar":ligar_desligar}, porta)
     # Exemplo de dados para retornar
-    udp_dados = {"status": "Temperatura alterada com sucesso", "ligar_desligar": ligar_desligar, "porta": porta}
+    udp_dados = {"ligar_desligar": ligar_desligar, "porta": porta}
     return jsonify(udp_dados)
 
 
@@ -94,6 +93,7 @@ def enviar_via_tcp(dados_json, porta):
             print("Mensagem enviada via TCP")
         
     except Exception as e:
+        print(dados_json)
         print(f"Erro ao enviar mensagem via TCP: {e}")
 
 if __name__ == "__main__":

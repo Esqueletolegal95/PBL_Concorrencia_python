@@ -32,6 +32,7 @@ def enviar_mensagem_udp():
             while True:
 
                 mensagem_dict = {
+                    'ip': host_ip,
                     'porta': 1236,
                     'temperatura': temperatura,
                     'ligado':ligado

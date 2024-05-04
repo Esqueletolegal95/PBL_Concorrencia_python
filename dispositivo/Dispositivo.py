@@ -4,9 +4,11 @@ import json
 import time
 import threading
 
+
+
 temperatura = random.randint(0, 34)
 ligado = True
-
+current_port = 0
 def modificarTemperatura(novaTemperatura):
     return novaTemperatura
 
@@ -23,41 +25,52 @@ def liga_desliga():
     if ligado:
         ligado = False
     else:
-        ligado=True
+        ligado = True
+
+def encontrar_porta_livre(initial_port):
+    """
+    Função para encontrar uma porta livre.
+    """
+    global current_port
+    current_port = initial_port
+    while True:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind((host_ip, current_port))
+                return current_port
+        except OSError:
+            current_port += 1
 
 def enviar_mensagem_udp():
     global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             while True:
-                mensagem_dict = {
-                    'porta': 1237,
-                    'temperatura': temperatura,
-                    'ligado':ligado
-                }
-                
-                mensagem_json = json.dumps(mensagem_dict)
-                
-                s.sendto(mensagem_json.encode(), ("localhost", 1234))  # Enviar via UDP
 
-                
+                mensagem_dict = {
+                    'ip': host_ip,
+                    'porta': current_port,
+                    'temperatura': temperatura,
+                    'ligado': ligado
+                }
+
                 mensagem_json = json.dumps(mensagem_dict)
-                
-                s.sendto(mensagem_json.encode(), ("localhost", 1234))  # Enviar via UDP
+
+                s.sendto(mensagem_json.encode(), ("172.17.0.2", 1234))  # Enviar via UDP
 
                 time.sleep(1)
     except Exception as e:
         print(f"Erro ao enviar mensagem UDP: {e}")
-    
 
 def receber_mensagem_tcp():
     global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("localhost", 1237))
+            porta_tcp = encontrar_porta_livre(1237)
+            s.bind(("0.0.0.0", porta_tcp))
             s.listen(1)  # Aceitar apenas uma conexão por vez
 
-            print(f"Aguardando conexão TCP em {host_ip}:5000...")
+            print(f"Aguardando conexão TCP em {host_ip}:{porta_tcp}...")
             conn, addr = s.accept()  # Aceitar conexão
             print(f"Conexão estabelecida com {addr}")
 
@@ -70,10 +83,10 @@ def receber_mensagem_tcp():
                     temperatura = mensagem["Temperatura"]
                     print(temperatura)
                 elif "ligar_desligar" in mensagem:
-                    liga_desliga() 
+                    liga_desliga()
                     print(ligado)
                 print(f"Mensagem TCP recebida: {mensagem}")
-                
+
     except Exception as e:
         print(f"Erro ao receber mensagem TCP: {e}")
 
@@ -84,12 +97,11 @@ def main():
     try:
         udp_thread = threading.Thread(target=servidor_udp)
         tcp_thread = threading.Thread(target=receber_mensagem_tcp)
-        
+
         udp_thread.start()
         tcp_thread.start()
 
         # Execução principal aqui, se necessário
-        input("Pressione Enter para encerrar...\n")
     except Exception as e:
         print(f"Erro no main: {e}")
 

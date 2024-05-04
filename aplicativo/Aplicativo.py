@@ -14,7 +14,7 @@ host_ip = get_host_ip_address()
 print(host_ip)
 def pegar_dados():
     try:
-        # Fazendo a requisição GET
+        # Fazendo a requisição GET1
         response = requests.get(f'http://{host_ip}:5050/udp_dados')
 
         # Verificando se a requisição foi bem-sucedida
@@ -32,7 +32,7 @@ def mudar_temperatura(novaTemperatura, porta):
     try:
         # Define a URL e os dados a serem enviados
         url = f'http://{host_ip}:5050/mudar_temperatura'
-        payload = {'novaTemperatura': novaTemperatura, 'porta': porta}
+        payload = {'novaTemperatura': novaTemperatura,'porta': porta}
 
         # Enviar requisição POST com os dados em formato JSON
         response = requests.post(url, json=payload)
@@ -40,7 +40,6 @@ def mudar_temperatura(novaTemperatura, porta):
         # Verificando se a requisição foi bem-sucedida
         if response.status_code == 200:
             data = response.json()  # Converte resposta para JSON
-            print(data)
             return data
         else:
             print('Erro na requisição:', response.status_code)
@@ -63,12 +62,12 @@ def menu():
         if opcao == '1':
             visualizar_informacoes()
         elif opcao == '2':
-            porta = int(input("Digite a porta do dispositivo a ser Ligado/Desligado: "))
+            porta = int(input("Digite a porta UDP do dispositivo a ser Ligado/Desligado: "))
             ligar_desligar_dispositivo('ligar',porta)
         elif opcao == '3':
             porta = int(input("Digite a porta do dispositivo: "))
             temperatura = int(input("Digite a temperatura: "))
-            mudar_temperatura(porta, temperatura)
+            mudar_temperatura(temperatura, porta)
         elif opcao == '4':
             print("Saindo do programa...")
             break
@@ -101,7 +100,7 @@ def ligar_desligar_dispositivo(ligar_desligar, porta):
     try:
         # Define a URL e os dados a serem enviados
         url = f'http://{host_ip}:5050/ligar_desligar'
-        payload = {'ligar_desligar': ligar_desligar, 'porta': porta}
+        payload = {'ligar_desligar': ligar_desligar,  'porta': porta}
 
         # Enviar requisição POST com os dados em formato JSON
         response = requests.post(url, json=payload)
