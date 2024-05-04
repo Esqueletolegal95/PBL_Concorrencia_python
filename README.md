@@ -34,3 +34,4 @@
     ```bash
     docker run -it server
     ```
+Após isso, deverá executar o código `aplicativo.py`, onde verá as opções disponíveis para o gerenciamento dos dispositivos.
