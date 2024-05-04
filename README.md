@@ -6,16 +6,12 @@
     docker build -t server .
     ```
 
-2. **Executar o Container (Configurando a Porta)**
+2. **Executar o Container (Configurando as Portas)**
 
     ```bash
-    docker run -p 1234:1234 server
+     docker run -p 5050:5050 -p 1234:1234/udp -p 1235:1235 server
     ```
 
-3. **Executar no Modo Interativo**
-
-    ```bash
-    docker run -it server
     ```
  4. **Criar Containers Para Dispositivo**
 
@@ -26,12 +22,8 @@
 5. **Executar o Container (Configurando a Porta)**
 
     ```bash
-    docker run -p 1234:1234 dispositivo
+    docker run -p 1237:1237 dispositivo
     ```
 
-6. **Executar no Modo Interativo**
 
-    ```bash
-    docker run -it server
-    ```
 Após isso, deverá executar o código `aplicativo.py`, onde verá as opções disponíveis para o gerenciamento dos dispositivos.
