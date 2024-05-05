@@ -11,8 +11,6 @@
     ```bash
      docker run -p 5050:5050 -p 1234:1234/udp -p 1235:1235 server
     ```
-
-    ```
  4. **Criar Containers Para Dispositivo**
 
     ```bash
