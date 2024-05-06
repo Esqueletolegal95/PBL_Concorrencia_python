@@ -64,3 +64,5 @@ Em relação ao tratamento de conexões simultâneas as threads são utilizadas 
 3 - Starvation: Uma fila muito grande de variás threads a serem executadas pode fazer com que uma thread não possa executar
 
 4 - Overhead: Os recursos do sistema podem ser insuficientes para executar um número muito grande de Threads
+## Gerenciamento do dispositivo
+É possível ligar o dispositivo, mudar a temperatura e visualizar os seus dados remotamente pelo terminal ao executar ```Aplicativo.py``` ou acessar pela interface do dispositivo ao executar ```Dispositivo.py```
