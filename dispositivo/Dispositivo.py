@@ -12,8 +12,9 @@ ligado = True
 current_port = 0
 
 # Função para modificar a temperatura
-def modificarTemperatura(novaTemperatura):
-    return novaTemperatura
+def modificar_temperatura(nova_temperatura):
+    global temperatura
+    temperatura = nova_temperatura
 
 # Função para obter o endereço IP do host
 def get_host_ip_address():
@@ -25,10 +26,7 @@ host_ip = get_host_ip_address()
 # Função para ligar/desligar o dispositivo
 def liga_desliga():
     global ligado
-    if ligado:
-        ligado = False
-    else:
-        ligado = True
+    ligado = not ligado
 
 # Função para encontrar uma porta livre
 def encontrar_porta_livre(initial_port):
@@ -95,6 +93,26 @@ def receber_mensagem_tcp():
 def servidor_udp():
     enviar_mensagem_udp()
 
+# Função do menu
+def menu():
+    while True:
+        print("\nMenu:")
+        print("1. Mudar temperatura")
+        print("2. Ligado/Desligado")
+        print("3. Sair")
+        opcao = input("Escolha uma opção: ")
+        
+        if opcao == "1":
+            nova_temperatura = int(input("Digite a nova temperatura: "))
+            modificar_temperatura(nova_temperatura)
+        elif opcao == "2":
+            liga_desliga()
+            print("Dispositivo ligado" if ligado else "Dispositivo desligado")
+        elif opcao == "3":
+            break
+        else:
+            print("Opção inválida!")
+
 # Função principal
 def main():
     try:
@@ -103,7 +121,13 @@ def main():
         tcp_thread = threading.Thread(target=receber_mensagem_tcp)
         udp_thread.start()
         tcp_thread.start()
-        # Qualquer execução adicional poderia ser adicionada aqui
+        
+        # Inicia o menu em uma thread separada
+        menu_thread = threading.Thread(target=menu)
+        menu_thread.start()
+        
+        # Aguarda a conclusão do menu
+        menu_thread.join()
     except Exception as e:
         print(f"Erro no main: {e}")
 
