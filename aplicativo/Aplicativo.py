@@ -1,134 +1,137 @@
 import socket
-import requests
-dados = {}
-true = 'Ligado'
-false = 'Desligado'
-ip_dispositivos = '172.17.0.' #ultimo número será dito pelo usuário
+import random
+import json
+import time
+import threading
 
+# Gera uma temperatura aleatória entre 0 e 34 graus Celsius
+temperatura = random.randint(0, 34)
+# Define o estado inicial como ligado
+ligado = True
+# Variável global para armazenar a porta atual
+current_port = 0
 
+# Função para modificar a temperatura
+def modificarTemperatura(novaTemperatura):
+    return novaTemperatura
+
+# Função para obter o endereço IP do host
 def get_host_ip_address():
-    """
-    Função para obter o endereço IP do host.
-    """
     return socket.gethostbyname(socket.gethostname())
 
+# Obtém o endereço IP do host
 host_ip = get_host_ip_address()
+
 print(host_ip)
-def pegar_dados():
+# Função para ligar/desligar o dispositivo
+def liga_desliga():
+    global ligado
+    if ligado:
+        ligado = False
+    else:
+        ligado = True
+
+# Função para encontrar uma porta livre
+def encontrar_porta_livre(initial_port):
+    global current_port
+    current_port = initial_port
+    while True:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind((host_ip, current_port))
+                return current_port
+        except OSError:
+            current_port += 1
+
+# Função para enviar mensagem via UDP
+def enviar_mensagem_udp():
+    global temperatura
     try:
-        # Fazendo a requisição GET1
-        response = requests.get(f'http://{host_ip}:5050/udp_dados')
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            while True:
+                # Cria um dicionário com os dados a serem enviados
+                mensagem_dict = {
+                    'ip': host_ip,
+                    'porta': current_port,
+                    'temperatura': temperatura,
+                    'ligado': ligado
+                }
+                # Converte o dicionário em JSON
+                mensagem_json = json.dumps(mensagem_dict)
+                # Envia os dados via UDP para o endereço e porta especificados
+                s.sendto(mensagem_json.encode(), ("172.17.0.2", 1234))
+                # Aguarda um segundo antes de enviar a próxima mensagem
+                time.sleep(1)
+    except Exception as e:
+        print(f"Erro ao enviar mensagem UDP: {e}")
 
-        # Verificando se a requisição foi bem-sucedida
-        if response.status_code == 200:
-            data = response.json()  # Converte a resposta para JSON
-            return data
-        else:
-            print('Erro na requisição:', response.status_code)
-            
-    except requests.exceptions.ConnectionError as e:
-        print(f"Erro de conexão: {e}")
-
-
-def mudar_temperatura(novaTemperatura, ip):
+# Função para receber mensagens via TCP
+def receber_mensagem_tcp():
+    global temperatura
     try:
-        # Define a URL e os dados a serem enviados
-        url = f'http://{host_ip}:5050/mudar_temperatura'
-        payload = {'novaTemperatura': novaTemperatura,'ip': ip}
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            # Encontra uma porta livre para escutar as conexões TCP
+            porta_tcp = encontrar_porta_livre(1237)
+            s.bind(("0.0.0.0", porta_tcp))
+            s.listen(1)  # Aceita apenas uma conexão por vez
+            print(f"Aguardando conexão TCP em {host_ip}:{porta_tcp}...")
+            conn, addr = s.accept()  # Aceita uma conexão
+            print(f"Conexão estabelecida com {addr}")
+            while True:
+                data = conn.recv(1024)  # Recebe dados do cliente
+                if not data:
+                    break
+                mensagem = json.loads(data.decode())  # Decodifica a mensagem JSON
+                if "Temperatura" in mensagem:
+                    temperatura = mensagem["Temperatura"]
+                    print(temperatura)
+                elif "ligar_desligar" in mensagem:
+                    liga_desliga()
+                    print(ligado)
+                print(f"Mensagem TCP recebida: {mensagem}")
+    except Exception as e:
+        print(f"Erro ao receber mensagem TCP: {e}")
 
-        # Enviar requisição POST com os dados em formato JSON
-        response = requests.post(url, json=payload)
-
-        # Verificando se a requisição foi bem-sucedida
-        if response.status_code == 200:
-            data = response.json()  # Converte resposta para JSON
-            return data
-        else:
-            print('Erro na requisição:', response.status_code)
-            
-    except requests.exceptions.ConnectionError as e:
-        print(f"Erro de conexão: {e}")
-
-
+# Função para iniciar o servidor UDP em uma thread separada
+def servidor_udp():
+    enviar_mensagem_udp()
 
 def menu():
     while True:
-        print("Escolha uma opção:")
-        print("1- Visualizar informações")
-        print("2- Ligar/Desligar dispositivo")
-        print("3- Mudar Temperatura")
-        print("4- Sair do programa")
-
-        opcao = input("Digite o número da opção desejada: ")
-
-        if opcao == '1':
-            visualizar_informacoes()
-        elif opcao == '2':
-            ip = ip_dispositivos + (input("Digite a porta UDP do dispositivo a ser Ligado/Desligado: "))
-            ligar_desligar_dispositivo('ligar',ip)
-        elif opcao == '3':
-            ip = ip_dispositivos + (input("Digite a porta do dispositivo: "))
-            temperatura = int(input("Digite a temperatura: "))
-            mudar_temperatura(temperatura, ip)
-        elif opcao == '4':
-            print("Saindo do programa...")
+        print("\nMenu:")
+        print("1. Mudar temperatura")
+        print("2. Ligado/Desligado")
+        print("3. Sair")
+        opcao = input("Escolha uma opção: ")
+        
+        if opcao == "1":
+            nova_temperatura = int(input("Digite a nova temperatura: "))
+            modificarTemperatura(nova_temperatura)
+        elif opcao == "2":
+            liga_desliga()
+            print("Dispositivo ligado" if ligado else "Dispositivo desligado")
+        elif opcao == "3":
             break
         else:
-            print("Opção inválida. Por favor, escolha uma opção válida.")
+            print("Opção inválida!")
 
-def visualizar_informacoes():
-    global dados
-    dados = pegar_dados()
-    print (dados)
-    for chave, valor_json in dados.items():
-        # Converte a string JSON em um dicionário Python
-        porta_info = eval(valor_json)
-        # Extrai as informações da porta
-        porta = porta_info['porta']
-        ip = porta_info['ip']
-        temperatura = porta_info['temperatura']
-        ligado = porta_info['ligado']
-        # Imprime as informações da porta
-        print(f"Informações do ip {ip}:")
-        partes = ip.split(".")
-        id = partes[-1]
-        print(f"Id do dispositivo: {id}")
-        print(f"Porta: {porta}")
-        if ligado == "Ligado":
-            print(f"Temperatura: {temperatura}")
-        print(f"Ligado: {ligado}")
-        print()
-    # Lógica para visualizar informações
-    print("Visualizando informações...")
-
-def ligar_desligar_dispositivo(ligar_desligar, porta):
-    # Lógica para ligar/desligar dispositivo
-    try:
-        # Define a URL e os dados a serem enviados
-        url = f'http://{host_ip}:5050/ligar_desligar'
-        payload = {'ligar_desligar': ligar_desligar,  'porta': porta}
-
-        # Enviar requisição POST com os dados em formato JSON
-        response = requests.post(url, json=payload)
-
-        # Verificando se a requisição foi bem-sucedida
-        if response.status_code == 200:
-            data = response.json()  # Converte resposta para JSON
-            print(data)
-            return data
-        else:
-            print('Erro na requisição:', response.status_code)
-            
-    except requests.exceptions.ConnectionError as e:
-        print(f"Erro de conexão: {e}")
-
-
-
-
-
-
+# Função principal
 def main():
-    menu()
+    try:
+        # Inicia duas threads para executar o servidor UDP e TCP simultaneamente
+        udp_thread = threading.Thread(target=servidor_udp)
+        tcp_thread = threading.Thread(target=receber_mensagem_tcp)
+        udp_thread.start()
+        tcp_thread.start()
+        menu_thread = threading.Thread(target=menu)
+        menu_thread.start()
+        # Qualquer execução adicional poderia ser adicionada aqui
+    except Exception as e:
+        print(f"Erro no main: {e}")
 
+        # Função do menu
+
+
+# Ponto de entrada do programa
 if __name__ == "__main__":
     main()

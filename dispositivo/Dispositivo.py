@@ -56,7 +56,7 @@ def enviar_mensagem_udp():
                 # Converte o dicionário em JSON
                 mensagem_json = json.dumps(mensagem_dict)
                 # Envia os dados via UDP para o endereço e porta especificados
-                s.sendto(mensagem_json.encode(), ("172.17.0.2", 1234))
+                s.sendto(mensagem_json.encode(), ("172.17.0.4", 1234))
                 # Aguarda um segundo antes de enviar a próxima mensagem
                 time.sleep(1)
     except Exception as e:
