@@ -44,8 +44,9 @@ Entre o dispositivo e broker é utilizado o protocolo UDP é utilizado para gara
 
 
 ## Interface da Aplicação (REST)
-A solução utiliza o framework Flask para gestão das rotas nos verbos ```GET```e ```POST```, ```PUT```e ```Detele``` naõ foram utilizado devido à sua irrelevância na gerência do dispositivo.
+A solução utiliza o framework Flask para gestão das rotas nos verbos ```GET```e ```POST```, ```PUT```e ```Detele``` não foram utilizado devido à sua irrelevância na gerência do dispositivo.
 As rotas são:
+
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/88b8ccfb-b372-4908-a906-c471f9618b5c)
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/ca410621-3f07-4c0f-a82b-d41a16a88cd0)
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/b8d25b08-03d2-42d4-b03c-b6af6d749ef4)
