@@ -4,22 +4,25 @@ import json
 import time
 import threading
 
-
-
+# Gera uma temperatura aleatória entre 0 e 34 graus Celsius
 temperatura = random.randint(0, 34)
+# Define o estado inicial como ligado
 ligado = True
+# Variável global para armazenar a porta atual
 current_port = 0
+
+# Função para modificar a temperatura
 def modificarTemperatura(novaTemperatura):
     return novaTemperatura
 
+# Função para obter o endereço IP do host
 def get_host_ip_address():
-    """
-    Função para obter o endereço IP do host.
-    """
     return socket.gethostbyname(socket.gethostname())
 
+# Obtém o endereço IP do host
 host_ip = get_host_ip_address()
 
+# Função para ligar/desligar o dispositivo
 def liga_desliga():
     global ligado
     if ligado:
@@ -27,10 +30,8 @@ def liga_desliga():
     else:
         ligado = True
 
+# Função para encontrar uma porta livre
 def encontrar_porta_livre(initial_port):
-    """
-    Função para encontrar uma porta livre.
-    """
     global current_port
     current_port = initial_port
     while True:
@@ -41,44 +42,45 @@ def encontrar_porta_livre(initial_port):
         except OSError:
             current_port += 1
 
+# Função para enviar mensagem via UDP
 def enviar_mensagem_udp():
     global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             while True:
-
+                # Cria um dicionário com os dados a serem enviados
                 mensagem_dict = {
                     'ip': host_ip,
                     'porta': current_port,
                     'temperatura': temperatura,
                     'ligado': ligado
                 }
-
+                # Converte o dicionário em JSON
                 mensagem_json = json.dumps(mensagem_dict)
-
-                s.sendto(mensagem_json.encode(), ("172.17.0.2", 1234))  # Enviar via UDP
-
+                # Envia os dados via UDP para o endereço e porta especificados
+                s.sendto(mensagem_json.encode(), ("172.17.0.2", 1234))
+                # Aguarda um segundo antes de enviar a próxima mensagem
                 time.sleep(1)
     except Exception as e:
         print(f"Erro ao enviar mensagem UDP: {e}")
 
+# Função para receber mensagens via TCP
 def receber_mensagem_tcp():
     global temperatura
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            # Encontra uma porta livre para escutar as conexões TCP
             porta_tcp = encontrar_porta_livre(1237)
             s.bind(("0.0.0.0", porta_tcp))
-            s.listen(1)  # Aceitar apenas uma conexão por vez
-
+            s.listen(1)  # Aceita apenas uma conexão por vez
             print(f"Aguardando conexão TCP em {host_ip}:{porta_tcp}...")
-            conn, addr = s.accept()  # Aceitar conexão
+            conn, addr = s.accept()  # Aceita uma conexão
             print(f"Conexão estabelecida com {addr}")
-
             while True:
-                data = conn.recv(1024)  # Receber dados do cliente
+                data = conn.recv(1024)  # Recebe dados do cliente
                 if not data:
                     break
-                mensagem = json.loads(data.decode())  # Decodificar a mensagem JSON
+                mensagem = json.loads(data.decode())  # Decodifica a mensagem JSON
                 if "Temperatura" in mensagem:
                     temperatura = mensagem["Temperatura"]
                     print(temperatura)
@@ -86,24 +88,25 @@ def receber_mensagem_tcp():
                     liga_desliga()
                     print(ligado)
                 print(f"Mensagem TCP recebida: {mensagem}")
-
     except Exception as e:
         print(f"Erro ao receber mensagem TCP: {e}")
 
+# Função para iniciar o servidor UDP em uma thread separada
 def servidor_udp():
     enviar_mensagem_udp()
 
+# Função principal
 def main():
     try:
+        # Inicia duas threads para executar o servidor UDP e TCP simultaneamente
         udp_thread = threading.Thread(target=servidor_udp)
         tcp_thread = threading.Thread(target=receber_mensagem_tcp)
-
         udp_thread.start()
         tcp_thread.start()
-
-        # Execução principal aqui, se necessário
+        # Qualquer execução adicional poderia ser adicionada aqui
     except Exception as e:
         print(f"Erro no main: {e}")
 
+# Ponto de entrada do programa
 if __name__ == "__main__":
     main()

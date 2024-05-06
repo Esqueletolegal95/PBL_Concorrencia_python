@@ -3,6 +3,8 @@ import requests
 dados = {}
 true = 'Ligado'
 false = 'Desligado'
+ip_dispositivos = '172.17.0.' #ultimo número será dito pelo usuário
+
 
 def get_host_ip_address():
     """
@@ -28,11 +30,11 @@ def pegar_dados():
         print(f"Erro de conexão: {e}")
 
 
-def mudar_temperatura(novaTemperatura, porta):
+def mudar_temperatura(novaTemperatura, ip):
     try:
         # Define a URL e os dados a serem enviados
         url = f'http://{host_ip}:5050/mudar_temperatura'
-        payload = {'novaTemperatura': novaTemperatura,'porta': porta}
+        payload = {'novaTemperatura': novaTemperatura,'ip': ip}
 
         # Enviar requisição POST com os dados em formato JSON
         response = requests.post(url, json=payload)
@@ -62,12 +64,12 @@ def menu():
         if opcao == '1':
             visualizar_informacoes()
         elif opcao == '2':
-            porta = int(input("Digite a porta UDP do dispositivo a ser Ligado/Desligado: "))
-            ligar_desligar_dispositivo('ligar',porta)
+            ip = ip_dispositivos + (input("Digite a porta UDP do dispositivo a ser Ligado/Desligado: "))
+            ligar_desligar_dispositivo('ligar',ip)
         elif opcao == '3':
-            porta = int(input("Digite a porta do dispositivo: "))
+            ip = ip_dispositivos + (input("Digite a porta do dispositivo: "))
             temperatura = int(input("Digite a temperatura: "))
-            mudar_temperatura(temperatura, porta)
+            mudar_temperatura(temperatura, ip)
         elif opcao == '4':
             print("Saindo do programa...")
             break
@@ -83,10 +85,14 @@ def visualizar_informacoes():
         porta_info = eval(valor_json)
         # Extrai as informações da porta
         porta = porta_info['porta']
+        ip = porta_info['ip']
         temperatura = porta_info['temperatura']
         ligado = porta_info['ligado']
         # Imprime as informações da porta
-        print(f"Informações da Porta {chave}:")
+        print(f"Informações do ip {ip}:")
+        partes = ip.split(".")
+        id = partes[-1]
+        print(f"Id do dispositivo: {id}")
         print(f"Porta: {porta}")
         if ligado == "Ligado":
             print(f"Temperatura: {temperatura}")
