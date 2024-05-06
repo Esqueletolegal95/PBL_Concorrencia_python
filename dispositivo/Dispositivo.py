@@ -56,7 +56,7 @@ def enviar_mensagem_udp():
                 # Converte o dicionário em JSON
                 mensagem_json = json.dumps(mensagem_dict)
                 # Envia os dados via UDP para o endereço e porta especificados
-                s.sendto(mensagem_json.encode(), ("172.17.0.4", 1234))
+                s.sendto(mensagem_json.encode(), ("172.17.0.5", 1234))
                 # Aguarda um segundo antes de enviar a próxima mensagem
                 time.sleep(1)
     except Exception as e:
@@ -65,29 +65,30 @@ def enviar_mensagem_udp():
 # Função para receber mensagens via TCP
 def receber_mensagem_tcp():
     global temperatura
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            # Encontra uma porta livre para escutar as conexões TCP
-            porta_tcp = encontrar_porta_livre(1237)
-            s.bind(("0.0.0.0", porta_tcp))
-            s.listen(1)  # Aceita apenas uma conexão por vez
-            print(f"Aguardando conexão TCP em {host_ip}:{porta_tcp}...")
-            conn, addr = s.accept()  # Aceita uma conexão
-            print(f"Conexão estabelecida com {addr}")
-            while True:
-                data = conn.recv(1024)  # Recebe dados do cliente
-                if not data:
-                    break
-                mensagem = json.loads(data.decode())  # Decodifica a mensagem JSON
-                if "Temperatura" in mensagem:
-                    temperatura = mensagem["Temperatura"]
-                    print(temperatura)
-                elif "ligar_desligar" in mensagem:
-                    liga_desliga()
-                    print(ligado)
-                print(f"Mensagem TCP recebida: {mensagem}")
-    except Exception as e:
-        print(f"Erro ao receber mensagem TCP: {e}")
+    while True:  # Loop externo para continuar aceitando conexões
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                # Encontra uma porta livre para escutar as conexões TCP
+                porta_tcp = 1237
+                s.bind(("0.0.0.0", porta_tcp))
+                s.listen(1)  # Aceita apenas uma conexão por vez
+                conn, addr = s.accept()  # Aceita uma conexão
+                while True:
+                    data = conn.recv(1024)  # Recebe dados do cliente
+                    if not data:
+                        conn.close()
+                        break
+                    mensagem = json.loads(data.decode())  # Decodifica a mensagem JSON
+                    if "Temperatura" in mensagem:
+                        temperatura = mensagem["Temperatura"]
+                        conn.close()
+                    elif "ligar_desligar" in mensagem:
+                        liga_desliga()
+                        conn.close()
+                    print(f"Mensagem TCP recebida: {mensagem}")
+                
+        except Exception as e:
+            print(f"Erro ao receber mensagem TCP: {e}")
 
 # Função para iniciar o servidor UDP em uma thread separada
 def servidor_udp():

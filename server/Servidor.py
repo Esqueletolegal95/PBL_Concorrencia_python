@@ -1,12 +1,19 @@
 import socket
 import threading
 import json
+import time
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
 udp_dados = {}  # Dicionário para armazenar dados recebidos via UDP
 tcp_dados = {}  # Dicionário para armazenar dados recebidos via TCP
+
+def limpar_dados():
+    global udp_dados
+    udp_dados = {}
+    time.sleep(6)
+
 
 # Função para lidar com dados recebidos via UDP
 def handle_client_udp(client_address, client_port, data):
@@ -115,6 +122,8 @@ if __name__ == "__main__":
     
     udp_thread.start()  # Iniciar thread do servidor UDP
     tcp_thread.start()  # Iniciar thread do servidor TCP
+
+    dados_thread = threading.Thread(target=limpar_dados)
 
     # Iniciar o aplicativo Flask para lidar com requisições HTTP
     app.run(host='0.0.0.0', port=5050)
