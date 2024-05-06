@@ -25,3 +25,7 @@
 
 
 Após isso, deverá executar o código `aplicativo.py`, onde verá as opções disponíveis para o gerenciamento dos dispositivos.
+
+## Arquitetura da solução (componentes e mensagens)
+A aplicação foi desenvolvida na versão mais recente do Python(3.12.2) e consiste de 3 componentes: uma aplicação, um broker service e um, ou mais, dispositivos. A ordem das mesnsagens trocadas é: O dispositivo envia mensagens para o Broker em loop, a aplicação faz uma requisição ao broker via API REST e por fim o Broker envia mensagem para o dispositivo.
+## Protocolo de comunicação entre dispositivo e Broker - camada de transporte
