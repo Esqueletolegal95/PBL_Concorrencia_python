@@ -29,3 +29,11 @@ Após isso, deverá executar o código `aplicativo.py`, onde verá as opções d
 ## Arquitetura da solução (componentes e mensagens)
 A aplicação foi desenvolvida na versão mais recente do Python(3.12.2) e consiste de 3 componentes: uma aplicação, um broker service e um, ou mais, dispositivos. A ordem das mesnsagens trocadas é: O dispositivo envia mensagens para o Broker em loop, a aplicação faz uma requisição ao broker via API REST e por fim o Broker envia mensagem para o dispositivo.
 ## Protocolo de comunicação entre dispositivo e Broker - camada de transporte
+Entre o dispositivo e broker é utilizado o protocolo UDP é utilizado para garantir um fluxo constantes de mensagem de forma rápida e eficiente, assim, perda de mensagens se torna irrelevante.
+
+![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/6578091d-e5de-4a64-becf-55f564f68451)
+
+
+![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/a921684f-d07f-4998-9581-db8374865750)
+
+
