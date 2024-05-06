@@ -20,7 +20,7 @@
 5. **Executar o Container (Configurando a Porta)**
 
     ```bash
-    docker run -p 1237:1237 dispositivo
+    docker run -it -p 1237:1237 dispositivo
     ```
 
 
@@ -50,5 +50,6 @@ As rotas são:
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/88b8ccfb-b372-4908-a906-c471f9618b5c)
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/ca410621-3f07-4c0f-a82b-d41a16a88cd0)
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/b8d25b08-03d2-42d4-b03c-b6af6d749ef4)
-
-
+## Formatacao, envio e tratamento de dados
+Todos os dados são armazendao em dicionários e convertidos no formado JSON para assim poder ser enviados pelo servidos, pelo dispositivo e pelo aplicativo via API REST nas rotas ```GET```e ```POST```. Dessa forma evitamos que erros envolvendo formatação de dados ocorra.
+![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/3ec6dd42-553a-451f-b7be-0ec08f559805)
