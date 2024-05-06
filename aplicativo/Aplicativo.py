@@ -65,12 +65,16 @@ def menu():
         if opcao == '1':
             visualizar_informacoes()
         elif opcao == '2':
+            print()
             ip = ip_dispositivos + (input("Digite a porta UDP do dispositivo a ser Ligado/Desligado: "))
             ligar_desligar_dispositivo('ligar_desligar',ip)
+            print()
         elif opcao == '3':
+            print()
             ip = ip_dispositivos + (input("Digite a porta do dispositivo: "))
             temperatura = int(input("Digite a temperatura: "))
             mudar_temperatura(temperatura, ip)
+            print()
         elif opcao == '4':
             print("Saindo do programa...")
             break
@@ -80,27 +84,32 @@ def menu():
 def visualizar_informacoes():
     global dados
     dados = pegar_dados()
-    print (dados)
-    for chave, valor_json in dados.items():
-        # Converte a string JSON em um dicionário Python
-        porta_info = eval(valor_json)
-        # Extrai as informações da porta
-        porta = porta_info['porta']
-        ip = porta_info['ip']
-        temperatura = porta_info['temperatura']
-        ligado = porta_info['ligado']
-        # Imprime as informações da porta
-        print(f"Informações do ip {ip}:")
-        partes = ip.split(".")
-        id = partes[-1]
-        print(f"Id do dispositivo: {id}")
-        print(f"Porta: {porta}")
-        if ligado == "Ligado":
-            print(f"Temperatura: {temperatura}")
-        print(f"Ligado: {ligado}")
-        print()
-    # Lógica para visualizar informações
+    print ()
     print("Visualizando informações...")
+    print ()
+    try:
+        for chave, valor_json in dados.items():
+            # Converte a string JSON em um dicionário Python
+            porta_info = eval(valor_json)
+            # Extrai as informações da porta
+            porta = porta_info['porta']
+            ip = porta_info['ip']
+            temperatura = porta_info['temperatura']
+            ligado = porta_info['ligado']
+            # Imprime as informações da porta
+            print(f"Informações do ip {ip}:")
+            partes = ip.split(".")
+            id = partes[-1]
+            print(f"Id do dispositivo: {id}")
+            print(f"Porta: {porta}")
+            if ligado == "Ligado":
+                print(f"Temperatura: {temperatura}")
+            print(f"Ligado: {ligado}")
+            print()
+        # Lógica para visualizar informações
+    except:
+        print("Servidor não conectado")
+    
 
 def ligar_desligar_dispositivo(ligar_desligar, ip):
     # Lógica para ligar/desligar dispositivo
@@ -115,7 +124,6 @@ def ligar_desligar_dispositivo(ligar_desligar, ip):
         # Verificando se a requisição foi bem-sucedida
         if response.status_code == 200:
             data = response.json()  # Converte resposta para JSON
-            print(data)
             return data
         else:
             print('Erro na requisição:', response.status_code)
