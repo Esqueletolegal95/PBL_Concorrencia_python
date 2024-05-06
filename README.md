@@ -53,3 +53,14 @@ As rotas são:
 ## Formatacao, envio e tratamento de dados
 Todos os dados são armazendao em dicionários e convertidos no formado JSON para assim poder ser enviados pelo servidos, pelo dispositivo e pelo aplicativo via API REST nas rotas ```GET```e ```POST```. Dessa forma evitamos que erros envolvendo formatação de dados ocorra.
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/3ec6dd42-553a-451f-b7be-0ec08f559805)
+
+## Tratamento de conexões simultâeas (threads)
+Em relação ao tratamento de conexões simultâneas as threads são utilizadas para tratar o envio e o recebimento de mensagens que foram enviadas em UDP, TCP ou via API REST. Embora nenhum problema em decorrência do uso de threads ou de concorrência foi identificado, vale ressaltar que vários problemas poderão surgir caso uma extrema quantidade de dispositivos ou de aplicações forem conectados causando problemas como:
+
+1 - condições de corrida: Resultados inconsistentes devido à duas ou mais threads tentando modificar a mesma variável
+
+2 - Deadlock: Uma thread não conseguir terminar a sua execução devido ao uso de um recurso que está sendo utilizada por outra thread
+
+3 - starvation: Uma fila muito grande de variás threads a serem executadas pode fazer com que uma thread não possa executar
+
+4 - overhead: Os recursos do sistema podem ser insuficientes para executar um número muito grande de Threads
