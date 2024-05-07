@@ -1,3 +1,5 @@
+## Introdução
+IOT(Internet das coisas) é um termo utilizado para descrever como objetos comuns do nosso cotidiano podem ser conectados à rede para que possam, assim, tranmitir e receber dados. com a compra da nossa empresa de tecnologia focada em IOT fomos encarregados de desenvolver um middleware facilite a comunicação entre diferentes dispositivos. O dispositivo broker foi desenvolvido para suportar a conexão de vários dispositivos e permitir o gerenciamento desses por uma aplicação permitido que sejam integrados a um mesma rede local.
 ## Como executar a aplicação:
  Para executar os dispositivos e o servidor é necessário abrir o terminal até o diretório onde estão os arquivos ```DOCKERFILE``` tanto do server quanto para o cliente e executar os passos abaixo:
  1. **Criar Containers Para Servidor**
@@ -28,12 +30,12 @@ Após isso, deverá executar o código `aplicativo.py`, onde verá as opções d
 
 ## Arquitetura da solução (componentes e mensagens)
 A aplicação foi desenvolvida na versão mais recente do Python(3.12.2) e consiste de 3 componentes: uma aplicação, um broker service e um, ou mais, dispositivos. A ordem das mesnsagens trocadas é: O dispositivo envia mensagens para o Broker em loop, a aplicação faz uma requisição ao broker via API REST e por fim o Broker envia mensagem para o dispositivo.
-## Protocolo de comunicação entre dispositivo e Broker - camada de transporte
+## Protocolo de comunicação entre dispositivo e Broker
 * UDP
 
 Entre o dispositivo e broker é utilizado o protocolo UDP é utilizado para garantir um fluxo constantes de mensagem de forma rápida e eficiente, embora menos segura que o TCP a perda de mensagens se torna irrelevante.
 
-![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/6578091d-e5de-4a64-becf-55f564f68451)
+![Figura 1](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/6578091d-e5de-4a64-becf-55f564f68451)
 
 
 ![image](https://github.com/Esqueletolegal95/PBL_Concorrencia_python/assets/113029820/a921684f-d07f-4998-9581-db8374865750)
@@ -78,4 +80,4 @@ Em relação ao tratamento de conexões simultâneas as threads são utilizadas 
 O sistema utiliza dois mecanismos para melhorar o tempo de resposta para a aplicação, as threads já citadas e o uso de um cache para facilitar a visualização de dados dos dispositivos pela aplicação.
 
 ## Confiabilidade da solução
-A solução possui tratamento de erros para problemas de conexão
+A solução possui tratamento de erros para problemas de conexão, ao desconectar qualquer dispositivo ele já será apagado do cache do broker e, dessa forma, não aparecerá na lista de dispositivos disponíveis, caso o broker seja desconectado a aplicação não conseguirá fazer nenhuma requisição via REST
